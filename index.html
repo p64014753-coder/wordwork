@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WorkWorld — Global Job Community</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f7f9fc;
+      --surface: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --success: #16a34a;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+    }
+
+    .container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255, 255, 255, 0.92);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(8px);
+    }
+
+    .nav {
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.02em; }
+    .logo span { color: var(--primary); }
+
+    .nav-links { display: flex; align-items: center; gap: 20px; }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.92rem;
+    }
+
+    .btn {
+      border: none;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.92rem;
+      padding: 12px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: .2s ease;
+    }
+
+    .btn:hover { background: var(--primary-dark); transform: translateY(-1px); }
+    .btn.secondary {
+      background: #fff;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .hero {
+      padding: 68px 0 44px;
+      display: grid;
+      gap: 24px;
+      grid-template-columns: 1.2fr .8fr;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 4.2vw, 3rem);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      margin-bottom: 14px;
+    }
+
+    .lead { color: var(--muted); font-size: 1.02rem; max-width: 640px; margin-bottom: 20px; }
+
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-panel { padding: 18px; }
+    .hero-panel h3 { font-size: 1rem; margin-bottom: 10px; }
+
+    .mini-chat {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .bubble {
+      max-width: 88%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+    }
+
+    .bubble.user { align-self: flex-end; background: #dbeafe; color: #1e3a8a; }
+    .bubble.agent { align-self: flex-start; background: #f1f5f9; color: #334155; }
+
+    section { padding: 18px 0 28px; }
+
+    .section-title {
+      font-size: 1.45rem;
+      letter-spacing: -0.02em;
+      margin-bottom: 14px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .feature { padding: 18px; }
+    .feature h4 { margin-bottom: 8px; }
+    .feature p { color: var(--muted); font-size: 0.92rem; }
+
+    .community {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 10px;
+    }
+
+    .community .card { padding: 18px; }
+
+    .social-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+    .social-list li {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+    }
+
+    .pill {
+      background: #ecfdf3;
+      color: #166534;
+      font-size: 0.75rem;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-weight: 700;
+    }
+
+    .cta {
+      margin: 24px 0 40px;
+      padding: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .cta p { color: var(--muted); }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 24px 0 36px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      text-align: center;
+    }
+
+    @media (max-width: 920px) {
+      .hero,
+      .community,
+      .grid-3 { grid-template-columns: 1fr; }
+
+      .nav-links a { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <div class="logo">Work<span>World</span></div>
+      <div class="nav-links">
+        <a href="#jobs">Jobs</a>
+        <a href="#community">Community</a>
+        <a href="#chat">Chat</a>
+        <button class="btn secondary">Sign In</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero" id="jobs">
+      <div>
+        <h1>Professional global jobs platform for workers and employers.</h1>
+        <p class="lead">
+          Discover verified opportunities, connect with recruiters, and join a social community that helps you move from search to success.
+        </p>
+        <div class="hero-actions">
+          <button class="btn">Find Jobs</button>
+          <button class="btn secondary">Join Community</button>
+        </div>
+      </div>
+
+      <aside class="card hero-panel" id="chat">
+        <h3>Live Community Chat</h3>
+        <p style="color:var(--muted);font-size:.88rem;">Quick support and peer conversation.</p>
+        <div class="mini-chat">
+          <div class="bubble user">Hi, any farm jobs in UK this week?</div>
+          <div class="bubble agent">Yes — 24 new openings posted today. Check “Seasonal Jobs”.</div>
+          <div class="bubble user">Great, sending my profile now.</div>
+        </div>
+      </aside>
+    </section>
+
+    <section>
+      <h2 class="section-title">Built for serious job searching</h2>
+      <div class="grid-3">
+        <article class="card feature">
+          <h4>Verified Listings</h4>
+          <p>Cleaner data, better filters, and fewer fake posts so users can apply with confidence.</p>
+        </article>
+        <article class="card feature">
+          <h4>Direct Applications</h4>
+          <p>Apply quickly to jobs with clear requirements, location, and employment type.</p>
+        </article>
+        <article class="card feature">
+          <h4>Profile + CV</h4>
+          <p>Maintain one professional profile and share it instantly with interested recruiters.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="community">
+      <h2 class="section-title">More social, less clutter</h2>
+      <div class="community">
+        <div class="card">
+          <h4>Community Rooms</h4>
+          <ul class="social-list">
+            <li><span>🇬🇧 UK Jobs Room</span><span class="pill">1.2k online</span></li>
+            <li><span>🌾 Farm & Harvest</span><span class="pill">840 online</span></li>
+            <li><span>🧡 Care Work</span><span class="pill">620 online</span></li>
+            <li><span>📦 Warehouse</span><span class="pill">510 online</span></li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h4>Social Features</h4>
+          <ul class="social-list">
+            <li><span>Real-time chat with moderators</span><span>💬</span></li>
+            <li><span>Country-based group channels</span><span>🌍</span></li>
+            <li><span>Application tips from members</span><span>🧠</span></li>
+            <li><span>Job alerts in chat threads</span><span>🔔</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="card cta">
+      <div>
+        <h3 style="margin-bottom:4px;">Ready to make your next move?</h3>
+        <p>Join WorkWorld and start applying with a cleaner, professional experience.</p>
+      </div>
+      <button class="btn">Create Free Account</button>
+    </section>
+  </main>
+
+  <footer>
+    © 2026 WorkWorld. Professional opportunities, social support, global reach.
+  </footer>
+</body>
+</html>
