@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OHS & WASH Training Portal</title>
+  <style>
+    :root { --blue:#003466; --green:#1b6d24; --bg:#f8f9fa; --text:#191c1d; --muted:#5b6572; }
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    .auth{position:fixed;inset:0;background:#0f172a;display:flex;align-items:center;justify-content:center;padding:16px;z-index:20}
+    .card{background:#fff;width:100%;max-width:360px;border-radius:14px;padding:20px}
+    .row{display:flex;gap:8px;margin-bottom:12px}
+    .tab{flex:1;padding:10px;border:1px solid #d7dce2;background:#fff;border-radius:10px;cursor:pointer}
+    .tab.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+    input{width:100%;padding:11px;border:1px solid #d7dce2;border-radius:10px;margin-top:10px}
+    button{width:100%;padding:11px;border:0;border-radius:10px;cursor:pointer;margin-top:10px}
+    .primary{background:var(--blue);color:#fff}.secondary{background:var(--green);color:#fff}.google{background:#4285f4;color:#fff}
+    .msg{margin-top:10px;font-size:.9rem;color:#b42318;min-height:20px}
+    .app{display:none}
+    nav{position:sticky;top:0;background:#ffffffd9;backdrop-filter:blur(8px);padding:14px 20px;display:flex;justify-content:space-between;align-items:center}
+    .hero{padding:56px 20px;background:linear-gradient(135deg,var(--blue),#1a4b84);color:#fff}
+    .hero h1{margin:0 0 10px}.hero p{margin:0;opacity:.85;max-width:720px}
+    .mods{padding:24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+    .mod{background:#fff;border-radius:14px;padding:18px;box-shadow:0 3px 16px rgba(0,0,0,.06)}
+    .mod h3{margin:6px 0}.muted{color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div id="authScreen" class="auth">
+    <div class="card">
+      <div class="row">
+        <button id="loginTab" class="tab active" type="button">Login</button>
+        <button id="registerTab" class="tab" type="button">Register</button>
+      </div>
+      <h2 id="authTitle" style="margin:4px 0 8px">Login</h2>
+      <input id="email" type="email" placeholder="Email" autocomplete="email" />
+      <input id="password" type="password" placeholder="Password (min 6 chars)" autocomplete="current-password" />
+      <button id="authAction" class="primary" type="button">Login</button>
+      <button id="googleBtn" class="google" type="button">Continue with Google</button>
+      <div id="authMsg" class="msg"></div>
+    </div>
+  </div>
+
+  <div id="appWrapper" class="app">
+    <nav>
+      <strong>OHS &amp; WASH Portal</strong>
+      <button id="logoutBtn" class="secondary" style="width:auto;margin:0;padding:8px 12px">Logout</button>
+    </nav>
+
+    <section id="landing">
+      <div class="hero">
+        <h1>Occupational Health, Safety &amp; WASH</h1>
+        <p>Curated video lessons, comprehensive study notes, and self-assessment quizzes for OHS and WASH professionals.</p>
+      </div>
+      <div class="mods">
+        <article class="mod">
+          <div>🦺</div>
+          <h3>Occupational Health &amp; Safety</h3>
+          <p class="muted">Hazard identification, accident prevention, PPE, fire safety, and more.</p>
+        </article>
+        <article class="mod">
+          <div>💧</div>
+          <h3>Water, Sanitation &amp; Hygiene</h3>
+          <p class="muted">Handwashing, water treatment, sanitation systems, and emergency WASH.</p>
+        </article>
+      </div>
+    </section>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getAuth,
+      GoogleAuthProvider,
+      signInWithPopup,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB9t_bzVpwEDm_aOYEdv0bjNAzk87SoGaY",
+      authDomain: "ohsc-2bac8.firebaseapp.com",
+      databaseURL: "https://ohsc-2bac8-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "ohsc-2bac8",
+      storageBucket: "ohsc-2bac8.appspot.com",
+      messagingSenderId: "327156473613",
+      appId: "1:327156473613:web:11f86c5cf6a12c664a9a44"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    const provider = new GoogleAuthProvider();
+
+    const authScreen = document.getElementById("authScreen");
+    const appWrapper = document.getElementById("appWrapper");
+    const authTitle = document.getElementById("authTitle");
+    const authAction = document.getElementById("authAction");
+    const loginTab = document.getElementById("loginTab");
+    const registerTab = document.getElementById("registerTab");
+    const authMsg = document.getElementById("authMsg");
+    const emailEl = document.getElementById("email");
+    const passEl = document.getElementById("password");
+
+    let mode = "login";
+
+    function setMode(next) {
+      mode = next;
+      const isLogin = mode === "login";
+      authTitle.textContent = isLogin ? "Login" : "Register";
+      authAction.textContent = isLogin ? "Login" : "Register";
+      authAction.className = isLogin ? "primary" : "secondary";
+      loginTab.classList.toggle("active", isLogin);
+      registerTab.classList.toggle("active", !isLogin);
+      authMsg.textContent = "";
+      passEl.autocomplete = isLogin ? "current-password" : "new-password";
+    }
+
+    function showError(err) {
+      authMsg.textContent = err?.message || "Authentication failed. Please try again.";
+    }
+
+    function validateInputs() {
+      const email = emailEl.value.trim();
+      const password = passEl.value;
+      if (!email || !password) {
+        authMsg.textContent = "Please enter both email and password.";
+        return null;
+      }
+      if (mode === "register" && password.length < 6) {
+        authMsg.textContent = "Password must be at least 6 characters.";
+        return null;
+      }
+      return { email, password };
+    }
+
+    async function handleAuthAction() {
+      const creds = validateInputs();
+      if (!creds) return;
+      authMsg.textContent = "";
+      try {
+        if (mode === "login") {
+          await signInWithEmailAndPassword(auth, creds.email, creds.password);
+        } else {
+          const userCred = await createUserWithEmailAndPassword(auth, creds.email, creds.password);
+          await set(ref(db, `users/${userCred.user.uid}`), { email: creds.email, createdAt: Date.now() });
+        }
+      } catch (e) {
+        showError(e);
+      }
+    }
+
+    async function handleGoogleLogin() {
+      authMsg.textContent = "";
+      try {
+        const result = await signInWithPopup(auth, provider);
+        await set(ref(db, `users/${result.user.uid}`), {
+          email: result.user.email || "",
+          displayName: result.user.displayName || "",
+          createdAt: Date.now()
+        });
+      } catch (e) {
+        showError(e);
+      }
+    }
+
+    loginTab.addEventListener("click", () => setMode("login"));
+    registerTab.addEventListener("click", () => setMode("register"));
+    authAction.addEventListener("click", handleAuthAction);
+    document.getElementById("googleBtn").addEventListener("click", handleGoogleLogin);
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      await signOut(auth);
+    });
+
+    [emailEl, passEl].forEach((el) => el.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") handleAuthAction();
+    }));
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        authScreen.style.display = "none";
+        appWrapper.style.display = "block";
+        document.getElementById("landing")?.scrollIntoView({ behavior: "instant", block: "start" });
+      } else {
+        authScreen.style.display = "flex";
+        appWrapper.style.display = "none";
+      }
+    });
+  </script>
+</body>
+</html>
